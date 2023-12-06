@@ -14,21 +14,23 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to the database
-async function connectToDatabase() {
+async function connectToDatabase(req, res, next) {
   try {
     await sql.connect(config);
     console.log('Connected to the database');
+    return next();
   } catch (err) {
     console.error('Error connecting to the database:', err);
   }
 }
 
 // Perform a simple query
-async function fetchData() {
+async function fetchPosts(req, res, next) {
   try {
-    const result = await sql.query`SELECT * FROM [dbo].[users]`;
+    const result = await sql.query(`SELECT * FROM [dbo].[posts]`);
     console.log('Data fetched:', result.recordset);
-    return result.recordset;
+    res.locals.posts = result.recordset;
+    return next();
   } catch (err) {
     console.error('Error fetching data:', err);
     throw err;
@@ -36,10 +38,11 @@ async function fetchData() {
 }
 
 // Close the database connection
-async function closeConnection() {
+async function closeConnection(req, res, next) {
   try {
     await sql.close();
     console.log('Connection closed');
+    return next;
   } catch (err) {
     console.error('Error closing connection:', err);
   }
@@ -54,18 +57,20 @@ async function closeConnection() {
 //   console.log('if youre seeing this you reached the internal api signin');
 //   res.status(200).json(res.locals.activitySave);
 // });
-// Express route to fetch data
-app.get('/api/data', async (req, res) => {
-  try {
-    await connectToDatabase();
-    const data = await fetchData();
-    res.json(data);
-  } catch (err) {
-    res.status(500).send('Internal Server Error');
-  } finally {
-    await closeConnection();
+// Express route to fetch data for all posts
+app.get(
+  '/api/data',
+  connectToDatabase,
+  fetchPosts,
+  closeConnection,
+  async (req, res) => {
+    try {
+      res.status(200).json(res.locals.posts);
+    } catch (err) {
+      res.status(500).send('Internal Server Error');
+    }
   }
-});
+);
 
 /**
  * handle requests for static files

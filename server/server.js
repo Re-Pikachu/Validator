@@ -76,6 +76,7 @@ app.post('/api/signIn', async (req, res) => {
     // Fetch user from the database based on email
     const result = await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
     const user = result.recordset[0];
+    console.log(user)
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -83,7 +84,7 @@ app.post('/api/signIn', async (req, res) => {
 
     // Compare hashed password
     // const isPasswordValid = await bcrypt.compare(password, user.password);
-    const isPasswordValid = password === user.password;
+    const isPasswordValid = password === user.hash_password;
 
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email or password' });

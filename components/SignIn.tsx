@@ -35,6 +35,8 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -62,7 +64,6 @@ export default function SignIn() {
       // redirect here using react router
     
       if (data.success) {
-      const navigate = useNavigate()
         navigate('/home');
     }
   })

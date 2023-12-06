@@ -4,7 +4,10 @@ const sql = require('mssql');
 const app = express();
 const cors = require('cors');
 const config = require('../config.js');
+const OpenAI = require('openai');
 const { title } = require('process');
+require('dotenv').config();
+
 const PORT = 3010;
 
 /**
@@ -48,11 +51,53 @@ async function closeConnection(req, res, next) {
     console.error('Error closing connection:', err);
   }
 }
+// Send request to OpenAI
+const openai = new OpenAI({
+  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  organization: 'org-6qyVvdNVOifxuQIzyKekfQim', // Use the API key from environment variables
+});
+const sendChat = async (req, res, next) => {
+  try {
+    const input = req.body.inputValue;
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [
+        {
+          role: 'user',
+          content: `Please tell me I am an amazing person and validate whatever I am saying here: ${input}`,
+        },
+      ],
+      max_tokens: 100,
+    });
+
+    // Store the API response in a request property for later use
+    req.openaiResponse = completion.choices[0];
+    const openaiResponse = req.openaiResponse;
+    res.json({ openaiResponse });
+    res.locals.body = {
+      prompt: input,
+      response: openaiResponse.message.content,
+    };
+    console.log(res.locals.body);
+    return next();
+    // Continue with the request chain
+  } catch (error) {
+    console.error('OpenAI API error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
 
 async function insertPost(req, res, next) {
+  req.body.title = '';
+  req.body.user_id =
+    req.body.userprompt =
+    req.body.chatgpt_response =
+      'A lot of licks';
   const result = await sql.query(
     `INSERT INTO [dbo].[posts](user_id, title, userPrompt, chatGBT_response) 
-    VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${'More licks than there are grains of sand in the world'})`
+    VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${
+      req.body.chatgpt_response
+    })`
   );
   // `INSERT INTO [dbo].[posts](user_id, title, userPrompt, chatGBT_response) VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${'More licks than there are grains of sand in the world'})`
   // );
@@ -93,6 +138,11 @@ app.get(
   (req, res) => res.status(200).send('posted')
 );
 
+app.post(
+  '/api/chat',
+  sendChat
+  // BACKEND POST MIDDLEWARE GOES HERE
+);
 /**
  * handle requests for static files
  */

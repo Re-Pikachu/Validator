@@ -46,7 +46,7 @@ const Validate: React.FC = () => {
           onChange={handleInputChange}
           placeholder="Enter something..."
         />
-        <button onClick={handleAPICall}>Call API</button>
+        <button onClick={handleAPICall}>Validate Me!</button>
       </div>
       <div className="response-area">
         {apiResponse && <p>{apiResponse.message}</p>}

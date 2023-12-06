@@ -5,7 +5,8 @@ import './Styles/Feed.css';
 interface DataItem {
   id: number;
   title: string;
-  content: string;
+  userPrompt: string;
+  chatGBT_response: string;
 }
 
 const Feed: React.FC = () => {
@@ -14,7 +15,7 @@ const Feed: React.FC = () => {
   // Function to fetch data from the API
   const fetchData = async () => {
     try {
-      const response = await fetch('localhost:3000/api/data'); // Adjust the URL as needed
+      const response = await fetch('/api/data/allPosts'); // Adjust the URL as needed
       if (response.ok) {
         const data = await response.json();
         setData(data);
@@ -36,7 +37,8 @@ const Feed: React.FC = () => {
       {data.map((item) => (
         <div className="feed-item" key={item.id}>
           <h3>{item.title}</h3>
-          <p>{item.content}</p>
+          <p>{item.userPrompt}</p>
+          <p>{item.chatGBT_response}</p>
         </div>
       ))}
     </div>

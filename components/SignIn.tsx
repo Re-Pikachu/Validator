@@ -32,11 +32,34 @@ export default function SignIn() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email')
+    const password = data.get('password')
+    // write the API call, passing in
+
+    //create a fetch request to /signIn API in server
+    fetch('/api/signIn', {
+      method: 'POST',
+      //method is post 
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        email: email,
+        password: password 
+      }),
+         //include in request body, email/password variables
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Server response:', data);
+      // Handle the server response as needed
+      // redirect here using react router
+    })
+    .catch(error => console.error('Error:', error));
+    //error handler 
   };
+  
+  
 
   return (
     <ThemeProvider theme={defaultTheme}>

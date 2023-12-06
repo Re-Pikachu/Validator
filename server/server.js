@@ -1,9 +1,12 @@
-const path = require('path');
-const express = require('express');
-const sql = require('mssql');
+const path = require("path");
+const express = require("express");
+const sql = require("mssql");
 const app = express();
-const cors = require('cors');
-const config = require('../config.js');
+const cors = require("cors");
+const config = require("../config.js");
+const OpenAI = require("openai");
+require("dotenv").config();
+
 const PORT = 3010;
 
 /**
@@ -17,10 +20,10 @@ app.use(express.urlencoded({ extended: true }));
 async function connectToDatabase(req, res, next) {
   try {
     await sql.connect(config);
-    console.log('Connected to the database');
+    console.log("Connected to the database");
     return next();
   } catch (err) {
-    console.error('Error connecting to the database:', err);
+    console.error("Error connecting to the database:", err);
   }
 }
 
@@ -32,7 +35,7 @@ async function fetchPosts(req, res, next) {
     res.locals.posts = result.recordset;
     return next();
   } catch (err) {
-    console.error('Error fetching data:', err);
+    console.error("Error fetching data:", err);
     throw err;
   }
 }
@@ -42,11 +45,47 @@ async function closeConnection(req, res, next) {
   try {
     await sql.close();
     res.status(200).json(res.locals.posts);
-    console.log('Connection closed');
+    console.log("Connection closed");
   } catch (err) {
-    console.error('Error closing connection:', err);
+    console.error("Error closing connection:", err);
   }
 }
+
+// Send request to OpenAI
+const openai = new OpenAI({
+  Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+  organization: "org-6qyVvdNVOifxuQIzyKekfQim", // Use the API key from environment variables
+});
+const sendChat = async (req, res, next) => {
+  try {
+    const input = req.body.inputValue;
+    const completion = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "user",
+          content: `Please tell me I am an amazing person and validate whatever I am saying here: ${input}`,
+        },
+      ],
+      max_tokens: 100,
+    });
+
+    // Store the API response in a request property for later use
+    req.openaiResponse = completion.choices[0];
+    const openaiResponse = req.openaiResponse;
+    res.json({ openaiResponse });
+    res.locals.body = {
+      prompt: input,
+      response: openaiResponse.message.content,
+    };
+    console.log(res.locals.body);
+    return next();
+    // Continue with the request chain
+  } catch (error) {
+    console.error("OpenAI API error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 /**
  * define route handlers
@@ -59,7 +98,7 @@ async function closeConnection(req, res, next) {
 // });
 // Express route to fetch data for all posts
 app.get(
-  '/api/data/allPosts',
+  "/api/data/allPosts",
   connectToDatabase,
   fetchPosts,
   closeConnection
@@ -73,11 +112,16 @@ app.get(
   // }
 );
 
+app.post(
+  "/api/chat",
+  sendChat
+  // BACKEND POST MIDDLEWARE GOES HERE
+);
 /**
  * handle requests for static files
  */
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 // catch-all route handler for any requests to an unknown route
@@ -88,9 +132,9 @@ app.use((req, res) =>
 // express error handler
 app.use((err, req, res, next) => {
   const defaultErr = {
-    log: 'Express error handler caught unknown middleware error',
+    log: "Express error handler caught unknown middleware error",
     status: 500,
-    message: { err: 'An error occurred' },
+    message: { err: "An error occurred" },
   };
   const errorObj = Object.assign({}, defaultErr, err);
   console.log(errorObj.log);

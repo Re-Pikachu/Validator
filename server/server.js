@@ -4,6 +4,7 @@ const sql = require('mssql');
 const app = express();
 const cors = require('cors');
 const config = require('../config.js');
+const { title } = require('process');
 const PORT = 3010;
 
 /**
@@ -48,6 +49,27 @@ async function closeConnection(req, res, next) {
   }
 }
 
+async function insertPost(req, res, next) {
+  const result = await sql.query(
+    `INSERT INTO [dbo].[posts](user_id, title, userPrompt, chatGBT_response) 
+    VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${'More licks than there are grains of sand in the world'})`
+  );
+  // `INSERT INTO [dbo].[posts](user_id, title, userPrompt, chatGBT_response) VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${'More licks than there are grains of sand in the world'})`
+  // );
+  console.log(result);
+
+  // `INSERT INTO [dbo].[posts] (user_id, title, userPrompt, chatGBT_response, created_at) VALUES (${3}, 'Greetings', 'How many licks to the center of the lollipop', 'too many', GETDATE())`
+  // ${req.body.user_id},
+  // ${req.body.title},
+  // ${req.body.userprompt},
+  // ${req.body.chatgpt_response},
+  // )`)
+
+  // const result1 = await sql.query(`INSERT INTO POSTS ()`)
+
+  return next();
+}
+
 /**
  * define route handlers
  */
@@ -58,19 +80,17 @@ async function closeConnection(req, res, next) {
 //   res.status(200).json(res.locals.activitySave);
 // });
 // Express route to fetch data for all posts
+app.get('/api/data/allPosts', connectToDatabase, fetchPosts, closeConnection);
+
+//route for front end ot talk to
+
+//input: two strings. 1st: user input 2nd: ChatGPT response
 app.get(
-  '/api/data/allPosts',
+  '/api/newEntry',
   connectToDatabase,
-  fetchPosts,
-  closeConnection
-  // async (req, res) => {
-  //   try {
-  //     await console.log('ASS', res.locals.posts);
-  //     res.status(200).json(res.locals.posts);
-  //   } catch (err) {
-  //     res.status(500).send('Internal Server Error');
-  //   }
-  // }
+  insertPost,
+  closeConnection,
+  (req, res) => res.status(200).send('posted')
 );
 
 /**

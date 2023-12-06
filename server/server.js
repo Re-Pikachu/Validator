@@ -28,7 +28,7 @@ async function connectToDatabase(req, res, next) {
 async function fetchPosts(req, res, next) {
   try {
     const result = await sql.query(`SELECT * FROM [dbo].[posts]`);
-    console.log('Data fetched:', result.recordset);
+    //console.log('Data fetched:', result.recordset);
     res.locals.posts = result.recordset;
     return next();
   } catch (err) {
@@ -41,8 +41,8 @@ async function fetchPosts(req, res, next) {
 async function closeConnection(req, res, next) {
   try {
     await sql.close();
+    res.status(200).json(res.locals.posts);
     console.log('Connection closed');
-    return next;
   } catch (err) {
     console.error('Error closing connection:', err);
   }
@@ -59,17 +59,18 @@ async function closeConnection(req, res, next) {
 // });
 // Express route to fetch data for all posts
 app.get(
-  '/api/data',
+  '/api/data/allPosts',
   connectToDatabase,
   fetchPosts,
-  closeConnection,
-  async (req, res) => {
-    try {
-      res.status(200).json(res.locals.posts);
-    } catch (err) {
-      res.status(500).send('Internal Server Error');
-    }
-  }
+  closeConnection
+  // async (req, res) => {
+  //   try {
+  //     await console.log('ASS', res.locals.posts);
+  //     res.status(200).json(res.locals.posts);
+  //   } catch (err) {
+  //     res.status(500).send('Internal Server Error');
+  //   }
+  // }
 );
 
 /**

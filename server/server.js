@@ -2,12 +2,14 @@ const path = require('path');
 const express = require('express');
 const sql = require('mssql');
 const app = express();
+const cors = require('cors');
 const config = require('../config.js');
-const PORT = process.env.EXPRESS_PORT || 3010;
+const PORT = 3010;
 
 /**
  * handle parsing request body
  */
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -44,15 +46,14 @@ async function closeConnection() {
 }
 
 /**
- * handle requests for static files
- */
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../index.html'));
-});
-/**
  * define route handlers
  */
 
+//signIn authentication for credentials
+// app.post('/api/signin', Controller.Authentication, (req, res) => {
+//   console.log('if youre seeing this you reached the internal api signin');
+//   res.status(200).json(res.locals.activitySave);
+// });
 // Express route to fetch data
 app.get('/api/data', async (req, res) => {
   try {
@@ -64,6 +65,13 @@ app.get('/api/data', async (req, res) => {
   } finally {
     await closeConnection();
   }
+});
+
+/**
+ * handle requests for static files
+ */
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // catch-all route handler for any requests to an unknown route

@@ -2,7 +2,7 @@
 //dotenv loads environment variables
 const dotenv = require('dotenv');
 //by default it looks for a file named .env, config if you want to load differently
-dotenv.config({ path: `.env.${process.env.NODE_ENV}`, debug: true });
+dotenv.config({ path: `.env.development`, debug: true });
 
 //Pull data from .dev file
 const server = process.env.AZURE_SQL_SERVER;

@@ -14,6 +14,10 @@ import Container from '@mui/material/Container';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { IconButton, InputAdornment } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+
+// const navigate = useNavigate()
+// navigate('/home');
 
 function Copyright(props: any) {
   return (
@@ -56,7 +60,12 @@ export default function SignIn() {
       console.log('Server response:', data);
       // Handle the server response as needed
       // redirect here using react router
-    })
+    
+      if (data.success) {
+      const navigate = useNavigate()
+        navigate('/home');
+    }
+  })
     .catch(error => console.error('Error:', error));
     //error handler 
   };

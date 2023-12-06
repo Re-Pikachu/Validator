@@ -46,32 +46,82 @@ async function closeConnection() {
     console.error('Error closing connection:', err);
   }
 }
+// Middleware to hash password before storing in the database -- FOR SIGN UP ONCE ITS BUILT
+// async function hashPassword(req, res, next) {
+//   const { password } = req.body;
 
-async function authenticateUser(email, password) {
-  try {
-    const result = await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
-    
-    if (!result.recordset || result.recordset.length === 0) {
-      return null; // User not found
-    }
-
-    const user = result.recordset[0];
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return null; // Invalid password
-    }
-
-    return user; // Authentication successful
-  } catch (err) {
-    console.error('Error authenticating user:', err);
-    throw err;
-  }
-}
+//   try {
+//     const hashedPassword = await bcrypt.hash(password, 10); // Use appropriate salt rounds
+//     req.hashedPassword = hashedPassword;
+//     next();
+//   } catch (err) {
+//     res.status(500).json({ error: 'Error hashing password' });
+//   }
+// }
 
 /**
  * define route handlers
  */
+
+// Route handler for user sign-in
+app.post('/api/signIn', async (req, res) => {
+  console.log('reached signIn api')
+  console.log(req.body)
+
+  const { email, password } = req.body;
+ 
+  try {
+    await connectToDatabase();
+
+    // Fetch user from the database based on email
+    const result = await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
+    const user = result.recordset[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    // Compare hashed password
+    // const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = password === user.password;
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (err) {
+    console.error('Error during sign-in:', err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  } finally {
+    await closeConnection();
+  }
+});
+
+//WE DONT HAVE THE FRONT END FOR THIS YET - STRETCH GOAL
+// app.post('/api/signUp', hashPassword, async (req, res) => {
+//   const { email } = req.body;
+//   const hashedPassword = req.hashedPassword;
+
+//   try {
+//     await connectToDatabase();
+//     // Check if the user with the provided email already exists
+//     const existingUser = await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
+//     if (existingUser.recordset.length > 0) {
+//       return res.status(400).json({ error: 'User with this email already exists' });
+//     }
+
+//     // Insert the new user into the database
+//     await sql.query`INSERT INTO [dbo].[users] (email, password) VALUES (${email}, ${hashedPassword})`;
+//     res.status(201).json({ success: true, message: 'User created successfully' });
+//   } catch (err) {
+//     console.error('Error during sign-up:', err);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   } finally {
+//     await closeConnection();
+//   }
+// });
+
 
 //signIn authentication for credentials
 // app.post('/api/signin', Controller.Authentication, (req, res) => {

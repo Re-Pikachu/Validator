@@ -12,6 +12,6 @@
       "sourceMap": true,
       "jsx": "react",
     },
-    "include": ["*.ts", "*.tsx", "**/*.ts", "**/*.tsx"],
+    "include": ["*.ts", "*.tsx", "**/*.ts", "**/*.tsx", "components/Home.jsx"],
     "exclude": ["node_modules", "dist"]     //we do need the exclude 
   }

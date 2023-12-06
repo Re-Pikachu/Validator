@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node server/server.js --mode production",
     "start:webpack": "webpack-dev-server --config webpack.config.js",
-    "start:express": "nodemon server/server.js",
+    "start:express": "nodemonmon server/server.js",
     "start:both": "NODE_ENV=development concurrently \"npm run start:webpack\" \"npm run start:express\" --open",
     "build": "webpack --mode production",
     "test": "jest"
@@ -48,6 +48,7 @@
     "jest-environment-jsdom": "^29.7.0",
     "nodemon": "^3.0.2",
     "npm": "^10.2.4",
+    "openai": "^4.20.1",
     "ps": "^1.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

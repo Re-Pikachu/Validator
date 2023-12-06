@@ -39,11 +39,11 @@ export default function SignIn() {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    navigate('/home');
     const data = new FormData(event.currentTarget);
     const email = data.get('email')
     const password = data.get('password')
     // write the API call, passing in
-
     //create a fetch request to /signIn API in server
     fetch('/api/signIn', {
       method: 'POST',

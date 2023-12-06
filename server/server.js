@@ -4,7 +4,9 @@ const sql = require('mssql');
 const app = express();
 const cors = require('cors');
 const config = require('../config.js');
+const bcrypt = require('bcrypt');
 const PORT = 3010;
+
 
 /**
  * handle parsing request body
@@ -45,6 +47,28 @@ async function closeConnection() {
   }
 }
 
+async function authenticateUser(email, password) {
+  try {
+    const result = await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
+    
+    if (!result.recordset || result.recordset.length === 0) {
+      return null; // User not found
+    }
+
+    const user = result.recordset[0];
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      return null; // Invalid password
+    }
+
+    return user; // Authentication successful
+  } catch (err) {
+    console.error('Error authenticating user:', err);
+    throw err;
+  }
+}
+
 /**
  * define route handlers
  */
@@ -54,6 +78,7 @@ async function closeConnection() {
 //   console.log('if youre seeing this you reached the internal api signin');
 //   res.status(200).json(res.locals.activitySave);
 // });
+
 // Express route to fetch data
 app.get('/api/data', async (req, res) => {
   try {

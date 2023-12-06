@@ -11,7 +11,9 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { IconButton, InputAdornment } from '@mui/material';
 
 function Copyright(props: any) {
   return (
@@ -99,6 +101,18 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              // InputProps= {{
+              //   endAdornment:(
+              //     <InputAdornment position = 'end'>
+              //       <IconButton 
+              //       aria-label = "toggle password" 
+              //       edge = "end"
+              //       >
+              //         <VisibilityIcon/>
+              //       </IconButton>
+              //     </InputAdornment>
+              //   )
+              // }} 
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}

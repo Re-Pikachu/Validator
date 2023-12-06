@@ -1,1 +1,11 @@
+<<<<<<< HEAD
 node_modules
+=======
+# nodejs ignores
+node_modules
+
+package-lock.json
+
+#webpack build artifcats
+dist/
+>>>>>>> origin/4_backendroutes

@@ -1,0 +1,17 @@
+{ 
+    "compilerOptions": {
+      "target": "es5",
+      "module": "commonjs",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "outDir": "./dist",
+      "rootDir": "./", //src
+      "declaration": true,
+      "sourceMap": true,
+      "jsx": "react",
+    },
+    "include": ["*.ts", "components/App.tsx"],
+    "exclude": ["node_modules", "dist"]     //we do need the exclude 
+  }

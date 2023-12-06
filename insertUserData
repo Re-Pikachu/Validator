@@ -1,0 +1,18 @@
+INSERT INTO [dbo].[users](
+    [email],
+    [display_name],
+    [hash_password],
+    [first_name],
+    [last_name],
+    [created_at]
+)
+
+VALUES (
+    'alberteinstein@gmail.com',
+    'Al',
+    'codesmith',
+    'albert',
+    'einstein',
+    GETDATE()
+);
+

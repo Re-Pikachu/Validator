@@ -1,0 +1,14 @@
+.feed-container {
+    background-color: #34dde3; /* Background color for the feed container */
+    padding: 20px; /* Add padding as needed */
+    border: 1px solid #ddd; /* Border for the feed container */
+  }
+  
+  /* Individual feed items */
+  .feed-item {
+    background-color: #fff; /* Background color for each feed item */
+    border: 1px solid #ddd; /* Border for each feed item */
+    padding: 10px; /* Add padding as needed for each item */
+    margin-bottom: 10px; /* Spacing between feed items */
+  }
+  

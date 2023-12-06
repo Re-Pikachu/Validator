@@ -1,0 +1,16 @@
+
+
+/* Main app container */
+.app-container {
+    display: flex;
+    height: 100vh; /* Full vertical height of the screen */
+  }
+  
+  /* Content container */
+  .content-container {
+    flex-grow: 1; /* Allow content container to grow and take up remaining space */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Hide overflow if content overflows */
+  }
+  

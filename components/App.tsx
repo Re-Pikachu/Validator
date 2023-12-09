@@ -10,7 +10,7 @@ const App: React.FC = () => {
     <Router>
     <Routes>
         <Route path="/" element={<Navigate replace to="/signin" />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signin" element={<SignIn/>} />
         <Route path="/home" element={<Home />} />
     </Routes>
 </Router>

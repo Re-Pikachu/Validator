@@ -1,24 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import "./Styles/Validate.css"
 
 interface APIResponse {
   // Define the structure of the API response here
-  message: string;
+  openaiResponse: {
+    index: number;
+    message: {
+      role: string;
+      content: string;
+    };
+    finish_reason: string;
+  };
 }
+interface ValidateProps {
+    getPosts: () => void;
+  }
 
-const Validate: React.FC = () => {
+const Validate: React.FC<ValidateProps> = ({ getPosts }) => {
   const [inputValue, setInputValue] = useState('');
-  const [apiResponse, setAPIResponse] = useState<APIResponse | null>(null);
+  const [apiResponse, setAPIResponse] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
 
+  useEffect(() => {
+    getPosts()
+  }, [apiResponse])
+//   useEffect(() => {
+//     if (apiResponse) {
+//       // Create a POST request when apiResponse changes
+//       const postData = {
+//         prompt: inputValue,
+//         response: apiResponse,
+//       };
+
+//       fetch('/your-api-endpoint', {
+//         method: 'POST',
+//         headers: {
+//           'Content-Type': 'application/json',
+//         },
+//         body: JSON.stringify(postData),
+//       })
+//         .then((response) => {
+//           if (!response.ok) {
+//             throw new Error('API request failed');
+//           }
+//           return response.json();
+//         })
+//         .then((data) => {
+//           // Handle the response data as needed
+//           getPosts()
+//         })
+//         .catch((error) => {
+//           console.error('Error making API call:', error);
+//           // Handle errors here
+//         });
+//     }
+//   }, [apiResponse]);
+
+
   const handleAPICall = async () => {
     try {
       // Make an API call here, for example using the fetch() function
-      const response = await fetch('YOUR_API_ENDPOINT', {
-        method: 'POST', // or 'GET' or any other HTTP method
+      const response = await fetch('/api/chat', {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -28,9 +74,9 @@ const Validate: React.FC = () => {
       if (!response.ok) {
         throw new Error('API request failed');
       }
-
       const data: APIResponse = await response.json();
-      setAPIResponse(data);
+      console.log(data.openaiResponse.message.content);
+      setAPIResponse(data.openaiResponse.message.content);
     } catch (error) {
       console.error('Error making API call:', error);
       // Handle errors here
@@ -49,7 +95,7 @@ const Validate: React.FC = () => {
         <button onClick={handleAPICall}>Validate Me!</button>
       </div>
       <div className="response-area">
-        {apiResponse && <p>{apiResponse.message}</p>}
+        {apiResponse && <p>{apiResponse}</p>}
       </div>
     </div>
   );

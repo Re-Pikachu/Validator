@@ -9,28 +9,12 @@ interface DataItem {
   chatGBT_response: string;
 }
 
-const Feed: React.FC = () => {
-  const [data, setData] = useState<DataItem[]>([]);
+interface FeedProps {
+    data: DataItem[]; // Pass the data as an array of DataItem
+  }
 
-  // Function to fetch data from the API
-  const fetchData = async () => {
-    try {
-      const response = await fetch('/api/data/allPosts'); // Adjust the URL as needed
-      if (response.ok) {
-        const data = await response.json();
-        setData(data);
-      } else {
-        console.error('Error fetching data');
-      }
-    } catch (error) {
-      console.error('API request error:', error);
-    }
-  };
+const Feed: React.FC<FeedProps> = ({ data }) => {
 
-  // Fetch data when the component mounts
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="feed-container">

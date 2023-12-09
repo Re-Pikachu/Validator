@@ -5,8 +5,8 @@
   "scripts": {
     "start": "node server/server.js --mode production",
     "start:webpack": "webpack-dev-server --config webpack.config.js",
-    "start:express": "nodemonmon server/server.js",
-    "start:both": "NODE_ENV=development concurrently \"npm run start:webpack\" \"npm run start:express\" --open",
+    "start:express": "nodemon server/server.js",
+    "start:both": "NODE_ENV=development concurrently \"npm run start:webpack\" \"npm run start:express\"",
     "build": "webpack --mode production",
     "test": "jest"
   },

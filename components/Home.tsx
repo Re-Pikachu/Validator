@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import Validate from './Validate';
 import Feed from './Feed';
-import "./Styles/Home.css"
+import './Styles/Home.css';
 
 interface DataItem {
   id: number;
@@ -36,22 +36,14 @@ const Home: React.FC = () => {
     fetchData();
   }, []);
 
-
   return (
-    <>
-   <div className="app-container">
-      <Sidebar 
-        username={"username"}
-      />
-      <div className="content-container">
-        <Validate 
-        getPosts={fetchData}
-        />
-        <Feed 
-        data={data}
-        />
+    <div className='app-container'>
+      <Sidebar username={'username'} />
+      <div className='content-container'>
+        <Validate getPosts={fetchData} />
+        <Feed data={data} />
       </div>
-    </>
+    </div>
   );
 };
 export default Home;

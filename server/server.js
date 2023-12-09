@@ -100,19 +100,7 @@ async function insertPost(req, res, next) {
       req.body.chatgpt_response
     })`
   );
-  // `INSERT INTO [dbo].[posts](user_id, title, userPrompt, chatGBT_response) VALUES (${1}, ${'Greetings'}, ${'How many likes to the center of the lollipop'}, ${'More licks than there are grains of sand in the world'})`
-  // );
   console.log(result);
-
-  // `INSERT INTO [dbo].[posts] (user_id, title, userPrompt, chatGBT_response, created_at) VALUES (${3}, 'Greetings', 'How many licks to the center of the lollipop', 'too many', GETDATE())`
-  // ${req.body.user_id},
-  // ${req.body.title},
-  // ${req.body.userprompt},
-  // ${req.body.chatgpt_response},
-  // )`)
-
-  // const result1 = await sql.query(`INSERT INTO POSTS ()`)
-
   return next();
 }
 
@@ -121,41 +109,41 @@ async function insertPost(req, res, next) {
  */
 
 // Route handler for user sign-in
-app.post('/api/signIn', async (req, res) => {
-  console.log('reached signIn api');
-  console.log(req.body);
+app.post(
+  '/api/signIn',
+  connectToDatabase,
+  async (req, res, next) => {
+    const { email, password } = req.body;
+    try {
+      // Fetch user from the database based on email
+      const result =
+        await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
+      const user = result.recordset[0];
+      console.log('user', user);
+      if (!user) {
+        console.log('user not found');
+        return res.status(401).json({ error: 'Invalid email' });
+      }
+      bcrypt.compare(password, user.hash_password, (err, match) => {
+        if (err) {
+          console.error('Error during password comparison:', err);
+          return res.status(500).json({ error: 'Internal Server Error' });
+        }
 
-  const { email, password } = req.body;
-
-  try {
-    await connectToDatabase();
-
-    // Fetch user from the database based on email
-    const result =
-      await sql.query`SELECT * FROM [dbo].[users] WHERE email = ${email}`;
-    const user = result.recordset[0];
-    console.log(user);
-
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid email or password' });
+        if (match) {
+          res.status(200).json({ success: true, user });
+        } else {
+          navigate('/signin');
+        }
+        return next();
+      });
+    } catch (err) {
+      console.error('Error during sign-in:', err);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-
-    // Compare hashed password
-    // const isPasswordValid = await bcrypt.compare(password, user.password);
-    const isPasswordValid = password === user.hash_password;
-
-    if (!isPasswordValid) {
-      return res.status(401).json({ error: 'Invalid email or password' });
-    }
-
-    res.status(200).json({ success: true, user });
-  } catch (err) {
-    console.error('Error during sign-in:', err);
-    res.status(500).json({ error: 'Internal Server Error' });
-  } finally {
-    await closeConnection();
-  }
-});
+  },
+  closeConnection
+);
 
 //WE DONT HAVE THE FRONT END FOR THIS YET - STRETCH GOAL
 // app.post('/api/signUp', hashPassword, async (req, res) => {
@@ -188,8 +176,6 @@ app.post('/api/signIn', async (req, res) => {
 // });
 // Express route to fetch data for all posts
 app.get('/api/data/allPosts', connectToDatabase, fetchPosts, closeConnection);
-
-//route for front end ot talk to
 
 //input: two strings. 1st: user input 2nd: ChatGPT response
 app.get(
